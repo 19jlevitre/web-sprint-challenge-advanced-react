@@ -12,10 +12,26 @@ const initialValue = {
 // This form should be handled by a "useForm" custom hook
 // Build out the logic needed for a form custom hook (see the useForm.js file)
 // and replace the necessary stateful logic from CheckoutForm with the hook
+const useLocalStorage = (key, initialValues) => {
+  const [values, setValues] = useState(()=> {
+    if (localStorage.getItem(key)) {
+      return(JSON.parse(localStorage.getItem(key)));
+  } else {
+      localStorage.setItem(key, JSON.stringify(initialValues));
+      return(initialValues);
+  }
+});
+const setStoredValues = (values) => {
+  localStorage.setItem(key, JSON.stringify(values));
+  setValues(values)
+}
 
-const CheckoutForm = (props) => {
+return [values, setStoredValues];
+}
+
+const useForm = (initialValues) => {
+  const [values, setValues] = useLocalStorage("stuff", initialValues);
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
-  const [values, setValues] = useState(initialValue);
 
   const handleChanges = (e) => {
     setValues({ ...values, [e.target.name]: e.target.value });
@@ -25,6 +41,23 @@ const CheckoutForm = (props) => {
     e.preventDefault();
     setShowSuccessMessage(true);
   };
+
+  return([values, showSuccessMessage, handleChanges, handleSubmit])
+
+}
+
+const CheckoutForm = (props) => {
+  
+const [values, showSuccessMessage, handleChanges, handleSubmit] = useForm(initialValue);
+
+  // const handleChanges = (e) => {
+  //   setValues({ ...values, [e.target.name]: e.target.value });
+  // };
+
+  // const handleSubmit = (e) => {
+  //   e.preventDefault();
+  //   setShowSuccessMessage(true);
+  // };
 
   return (
     <>
